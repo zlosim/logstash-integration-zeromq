@@ -156,7 +156,6 @@ class LogStash::Inputs::ZeroMQ < LogStash::Inputs::Base
     handle_message(output_queue) while !stop?
   rescue => e
     @logger.debug("ZMQ Error", :subscriber => @zsocket, :exception => e)
-    @logger.debug("Cause of the error", ZMQ::Util.errno, "dang")
     retry
   end # def run
 
