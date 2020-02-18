@@ -18,7 +18,7 @@ module LogStash::PluginMixins::ZeroMQ
 
   def error_check(rc, doing, eagain_not_error=false)
     unless ZMQ::Util.resultcode_ok?(rc) || (ZMQ::Util.errno == ZMQ::EAGAIN && eagain_not_error)
-      @logger.error("ZeroMQ error while #{doing}", { :error_code => rc })
+      @logger.error("ZeroMQ error while #{doing}", { :error_code => rc , :error_code => ZMQ::Util.errno})
       raise "ZeroMQ Error while #{doing}"
     end
   end # def error_check
