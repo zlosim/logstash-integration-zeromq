@@ -171,7 +171,10 @@ class LogStash::Inputs::ZeroMQ < LogStash::Inputs::Base
     parts = []
     rc = @zsocket.recv_strings(parts)
     error_check(rc, "in recv_strings", true)
-    return unless ZMQ::Util.resultcode_ok?(rc)
+    unless ZMQ::Util.resultcode_ok?(rc)
+      @logger.error("errno [#{ZMQ::Util.errno}] with description [#{ZMQ::Util.error_string}]")
+      return
+    end
 
     if @topology == "pubsub" && parts.length > 1
       # assume topic is a simple string
