@@ -91,7 +91,6 @@ class LogStash::Inputs::ZeroMQ < LogStash::Inputs::Base
     require "logstash/zeromq_mixin"
     self.class.send(:include, LogStash::PluginMixins::ZeroMQ)
     @host = Socket.gethostname
-    @context = ZMQ::Context.new
     init_socket
   end # def register
 
@@ -104,7 +103,7 @@ class LogStash::Inputs::ZeroMQ < LogStash::Inputs::Base
     when "pubsub"
       zmq_const = ZMQ::SUB
     end # case socket_type
-    @zsocket = @context.socket(zmq_const)
+    @zsocket = context.socket(zmq_const)
     error_check(@zsocket.setsockopt(ZMQ::LINGER, 1),
                 "while setting ZMQ::LINGER == 1)")
 
@@ -138,11 +137,15 @@ class LogStash::Inputs::ZeroMQ < LogStash::Inputs::Base
       error_check(result, "while closing the zmq socket")
     end
     puts "closing context"
-    @context.terminate
+    context.terminate
     puts 'done'
   rescue RuntimeError => e
     @logger.error("Failed to properly teardown ZeroMQ")
   end # def close
+
+  def context
+    @context ||= ZMQ::Context.new
+  end # def context
 
   def stop
     close
